@@ -21,6 +21,8 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.Keyboard.Key;
 import android.inputmethodservice.KeyboardView;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodSubtype;
 
 public class LatinKeyboardView extends KeyboardView {
@@ -35,6 +37,60 @@ public class LatinKeyboardView extends KeyboardView {
         super(context, attrs, defStyle);
     }
 
+    private SoftKeyboard mService;
+    public void setService(SoftKeyboard listener) {
+    	mService = listener;
+    }
+   private final int SWIPE_MIN_DISTANCE = 60;
+   private int mDirection = -1;
+   private int mDownX = 0;
+   private int mDownY = 0;
+   
+   @Override
+   public boolean onTouchEvent(MotionEvent event) {
+       int x = (int)event.getX();
+       int y = (int)event.getY();
+       boolean ret = false;
+       switch (event.getAction()) {
+       case MotionEvent.ACTION_DOWN:
+               mDownX = x;
+               mDownY = y;
+               ret = true;
+               break;
+       case MotionEvent.ACTION_MOVE:
+		   if (mDownX - x > SWIPE_MIN_DISTANCE) {
+	           // Left
+	           mService.keyDownUp(KeyEvent.KEYCODE_L);
+	           mDownX = x;
+	           mDownY = y;
+		           
+		   } else if (x - mDownX > SWIPE_MIN_DISTANCE) {
+	           // Right
+	           mService.keyDownUp(KeyEvent.KEYCODE_R);
+	           mDownX = x;
+	           mDownY = y;
+		           
+		   } else if (mDownY - y > SWIPE_MIN_DISTANCE) {
+	           // Up
+	           mService.keyDownUp(KeyEvent.KEYCODE_U);
+	           mDownX = x;
+	           mDownY = y;
+		           
+		   } else if (y - mDownY > SWIPE_MIN_DISTANCE) {
+			   // Down
+			   mService.keyDownUp(KeyEvent.KEYCODE_D);
+			   mDownX = x;
+			   mDownY = y;
+		           
+		   }
+		   ret = true;
+		   break;
+		case MotionEvent.ACTION_UP:                
+    		ret = true;
+    		break;
+    	}
+    	return ret;
+    }    
     @Override
     protected boolean onLongPress(Key key) {
         if (key.codes[0] == Keyboard.KEYCODE_CANCEL) {

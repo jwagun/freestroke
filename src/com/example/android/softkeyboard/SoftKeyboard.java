@@ -115,6 +115,7 @@ public class SoftKeyboard extends InputMethodService
                 R.layout.input, null);
         mInputView.setOnKeyboardActionListener(this);
         mInputView.setKeyboard(mQwertyKeyboard);
+        mInputView.setService(this);
         return mInputView;
     }
 
@@ -467,7 +468,7 @@ public class SoftKeyboard extends InputMethodService
     /**
      * Helper to send a key down / key up pair to the current editor.
      */
-    private void keyDownUp(int keyEventCode) {
+    public void keyDownUp(int keyEventCode) {
         getCurrentInputConnection().sendKeyEvent(
                 new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
         getCurrentInputConnection().sendKeyEvent(
